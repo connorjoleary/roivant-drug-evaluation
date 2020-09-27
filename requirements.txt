@@ -1,0 +1,2 @@
+Flask==1.1.2
+Flask_Migrate==2.5.3
