@@ -17,6 +17,7 @@ def hello_world():
 def create_user():
     """Create an account."""
     data = request.get_json()
+    print(db.engine.table_names())
     name = data['name']
     if name:
         new_account = Account(name=name,
