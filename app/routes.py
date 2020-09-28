@@ -1,12 +1,11 @@
-from flask import Flask
-# from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 
-app = Flask(__name__)
-# app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db) # this
+from datetime import datetime as dt
+
+from flask import current_app as app, request, make_response
+
+from . import db
+from .database.models.account import Account
+
 
 @app.route('/', methods=['GET'])
 def hello_world():
