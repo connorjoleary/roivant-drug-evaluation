@@ -41,7 +41,7 @@ fig.update_layout(height=700)
     Output('datatable-row-ids-container', "figure"),
     [Input('datatable-interactivity', "derived_virtual_data"),
      Input('datatable-interactivity', "derived_virtual_selected_rows")])
-     
+def update_graphs(rows, derived_virtual_selected_rows):
     if derived_virtual_selected_rows is None:
         derived_virtual_selected_rows = []
 
