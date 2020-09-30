@@ -11,8 +11,8 @@ from plotly.subplots import make_subplots
 import pandas as pd
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
 colors = {
     'background': '#111111',
@@ -40,17 +40,22 @@ fig.update_layout(height=700)
 @app.callback(
     Output('datatable-row-ids-container', "figure"),
     [Input('datatable-interactivity', "derived_virtual_data"),
-     Input('datatable-interactivity', "derived_virtual_selected_rows")])
-def update_graphs(rows, derived_virtual_selected_rows):
+    Input('datatable-interactivity', "derived_virtual_selected_rows"),
+    Input('datatable-interactivity', 'selected_columns'),
+    Input('datatable-interactivity', 'selected_row_ids')])
+def update_graphs(rows, derived_virtual_selected_rows, selected_columns, selected_row_ids):
     if derived_virtual_selected_rows is None:
         derived_virtual_selected_rows = []
 
     dff = df if rows is None else pd.DataFrame(rows)
 
     colors = ['#7FDBFF' if i in derived_virtual_selected_rows else '#0074D9'
-              for i in range(len(dff))]
+            for i in range(len(dff))]
 
-    return px.box(df, y="price_annual", hover_name='name', points="all", title='Price', color=colors)
+    if not selected_columns:
+        selected_columns=['price_annual']
+
+    return px.box(dff, y=selected_columns[0], hover_name='name', points="all", title='Price', color=colors)
 
 # fig.update_layout(
 #     plot_bgcolor=colors['background'],
@@ -70,23 +75,20 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     dash_table.DataTable(
         id='datatable-interactivity',
         columns=[
-            {"name": i, "id": i, "deletable": False, "selectable": False} for i in df.columns
+            {"name": i, "id": i, "deletable": False, "selectable": True} if i != 'name' else {"name": i, "id": i, "deletable": False, "selectable": False} for i in df.columns
         ],
         data=df.to_dict('records'),
         editable=False,
         filter_action="native",
         sort_action="native",
         sort_mode="multi",
+        column_selectable="single",
         row_selectable="multi",
-        row_deletable=False,
         selected_columns=[],
         selected_rows=[],
         page_action="native",
         page_current= 0,
         page_size= 10,
-        style_table={
-            'overflowY': 'scroll'
-        }
     ),
     dcc.Graph(id='datatable-row-ids-container'),
 
